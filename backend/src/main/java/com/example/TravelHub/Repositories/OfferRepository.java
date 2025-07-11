@@ -9,4 +9,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface OfferRepository extends MongoRepository<Offer, String> {
     List<OfferDto> findByFromAndTo(String from, String to);
+
+    List<Offer> findByFromAndToOrderByPriceAsc(String from, String to, int limit);
 }

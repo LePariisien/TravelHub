@@ -4,10 +4,15 @@ import com.example.TravelHub.Dtos.OfferDto;
 import com.example.TravelHub.Entities.Offer;
 import com.example.TravelHub.Services.DataGenerationService;
 import com.example.TravelHub.Services.OfferService;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/offers")
@@ -48,6 +53,32 @@ public class OfferController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
         offerService.delete(id);
+    }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<OfferDto>> searchOffers(
+            @RequestParam String from,
+            @RequestParam String to,
+            @RequestParam(defaultValue = "10") int limit) {
+        long startTime = System.nanoTime();
+
+        try {
+            List<OfferDto> offers = offerService.findOffers(from, to, limit);
+
+            long endTime = System.nanoTime();
+            long durationMs = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
+            System.out.println("GET /offers?from=" + from + "&to=" + to + "&limit=" + limit + " executed in "
+                    + durationMs + " ms");
+
+            return ResponseEntity.ok(offers);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Bad Request: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            System.err.println("Internal Server Error for /offers: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/generate")
