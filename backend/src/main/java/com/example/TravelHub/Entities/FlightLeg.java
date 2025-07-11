@@ -18,7 +18,4 @@ public class FlightLeg {
     private String arrival;
     private String departureTime;
     private String arrivalTime;
-    // Ajoute d'autres attributs si besoin
-
-    // Getters et setters
 }

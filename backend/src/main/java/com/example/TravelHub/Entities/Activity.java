@@ -16,7 +16,4 @@ public class Activity {
     private String name;
     private String description;
     private double price;
-    // Ajoute d'autres attributs si besoin
-
-    // Getters et setters
 }
