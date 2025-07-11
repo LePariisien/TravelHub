@@ -37,8 +37,17 @@ public class OfferService {
                 .toList();
     }
 
-    public OfferDto save(Offer offer) {
-        return new OfferDto(offerRepository.save(offer));
+    public Offer save(Offer offer) {
+        Offer saved = offerRepository.save(offer);
+        try {
+            String json = objectMapper.writeValueAsString(saved);
+            System.out.println("[OfferService] About to publish offer to Redis: " + json);
+            Long receivers = redisTemplate.convertAndSend("offers:new", json);
+            System.out.println("[OfferService] Redis publish done. Receivers: " + receivers);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return saved;
     }
 
     public void delete(String id) {
