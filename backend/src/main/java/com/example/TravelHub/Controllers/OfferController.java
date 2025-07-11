@@ -66,7 +66,8 @@ public class OfferController {
 
     @PostMapping
     public OfferDto create(@RequestBody Offer offer) {
-        return offerService.save(offer);
+        Offer saved = offerService.save(offer);
+        return new OfferDto(saved);
     }
 
     @DeleteMapping("/{id}")
