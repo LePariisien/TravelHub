@@ -1,6 +1,7 @@
 package com.example.TravelHub.Controllers;
 
 import com.example.TravelHub.Dtos.OfferDto;
+import com.example.TravelHub.Dtos.OfferWithRelatedDto;
 import com.example.TravelHub.Entities.Offer;
 import com.example.TravelHub.Services.DataGenerationService;
 import com.example.TravelHub.Services.OfferService;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,9 +29,26 @@ public class OfferController {
         this.offerService = offerService;
     }
 
-    @GetMapping("/{id}")
-    public OfferDto getById(@PathVariable String id) {
-        return offerService.findById(id);
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OfferWithRelatedDto> getOfferDetails(@PathVariable String id) {
+        long startTime = System.nanoTime();
+
+        try {
+            OfferWithRelatedDto offerDetail = offerService.findById(id);
+
+            long endTime = System.nanoTime();
+            long durationMs = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
+            System.out.println("GET /offers/" + id + " executed in " + durationMs + " ms");
+
+            return ResponseEntity.ok(offerDetail);
+        } catch (ResponseStatusException e) {
+            System.err.println("API Error for /offers/" + id + ": " + e.getReason());
+            throw e;
+        } catch (Exception e) {
+            System.err.println("Internal Server Error for /offers/" + id + ": " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping
