@@ -16,7 +16,4 @@ public class Hotel {
     private String name;
     private String address;
     private int stars;
-    // Ajoute d'autres attributs si besoin
-
-    // Getters et setters
 }
